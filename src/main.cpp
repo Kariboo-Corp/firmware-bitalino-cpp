@@ -36,10 +36,16 @@ byte ledIncr = LEDINCR_SLOW;
 byte seq, simulSeq, nChannels, chTable[6];
 bool simulated;
 
+int seconds = 0, minutes = 0, hours = 0, milliseconds = 0;
+
+int RTC_ADDR = 0x68;
+
 int main(void)
 {    
       debugger.init();
       debugger.log("main -> BitAlino CPP + SS debug v0.1\n\r");
+
+      milliseconds = 0;
 
       // Assign PIO pull-ups to digital inputs
       PORTD = BIT_GP | BIT_DI1 | BIT_DI2 | BIT_DI3;
@@ -105,11 +111,23 @@ int main(void)
       debugger.log("main -> sleep mode configured.\n\r");
 
       // Stop unused modules
-      PRR = B(PRTWI) | B(PRSPI);   // keep timers, USART and ADC running
+      //PRR = B(PRTWI) | B(PRSPI);   // keep timers, USART and ADC running -- default configuration
+
+      PRR = B(PRSPI);   // keep timers, USART, TWI and ADC running
 
       debugger.log("main -> power configured. PRR : 0x%0.2X\n\r", PRR);
       
       sei();   // Enable interrupts
+
+      twi_init(100000);
+      byte rtc_data[3];
+      memset(rtc_data, 0, sizeof(rtc_data));
+      debugger.log("main -> twi read status : %0.2X\n\r", twi_read(RTC_ADDR, 0x00, rtc_data, sizeof(rtc_data)));
+      seconds = 10 * ((rtc_data[0] & 0x70) >> 4) + (rtc_data[0] & 0x0F);
+      minutes = 10 * ((rtc_data[1] & 0x70) >> 4) + (rtc_data[1] & 0x0F);
+      hours = 10 * ((rtc_data[2] & 0x30) >> 4) + (rtc_data[2] & 0x0F);
+
+      debugger.log("main -> %0.2X:%0.2X:%0.2X\n\r", rtc_data[2], rtc_data[1], rtc_data[0]);
       
       debugger.log("main -> interrupt configured & enabled.\n\r");
       debugger.log("main -> init done.\n\r");

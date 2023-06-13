@@ -24,6 +24,7 @@
  
  */
 
+#include <twi.hpp>
 #include <SoftwareSerial.h>
 #include "Assets.hpp"
 
@@ -46,9 +47,6 @@
 #define BATTHRES_BASE   527
 
 #include "pios.hpp"       // build/pios.h is processed from pios.h
-
-#include <SoftwareSerial.h>
-#include "Assets.hpp"
 
 // Type definitions
 typedef uint8_t  byte;

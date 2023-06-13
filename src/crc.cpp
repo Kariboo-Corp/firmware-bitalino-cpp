@@ -45,7 +45,7 @@ void sendFrameCRC(const byte *frame)
       // send byte
       loop_until_bit_is_set(UCSR0A, UDRE0);
       UDR0 = b;
-      debugger.log("sendFrameCRC -> frame[%d] = 0x%0.2X", i, b);
+      debugger.log("sendFrameCRC -> frame[%d] = 0x%0.2X\n\r", i, b);
       
       // calculate CRC nibble by nibble
       crc = pgm_read_byte(crcTable + crc) ^ (b >> 4);
